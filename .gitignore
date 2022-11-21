@@ -1,0 +1,4 @@
+.env
+.serverless
+dist
+node_modules

@@ -1,0 +1,57 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Deezer Favorites to Playlist</title>
+        <base href="/" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script>
+            document.addEventListener('DOMContentLoaded', async () => await main());
+
+            const BACKEND_URL = 'https://ja2wh1uznb.execute-api.eu-west-3.amazonaws.com';
+
+            // sss
+            function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key);
+                if (!itemStr) {
+                    return null;
+                }
+                const item = JSON.parse(itemStr);
+                const now = new Date();
+                if (now >= new Date(item.expiry)) {
+                    // If the item is expired, delete the item from storage and return null
+                    localStorage.removeItem(key);
+                    return null;
+                }
+                return item.value;
+            }
+
+            function addSearchParams(url, searchParams) {
+                for (const [name, value] of Object.entries(searchParams)) {
+                    if (value !== undefined) {
+                        url.searchParams.set(name, String(value));
+                    }
+                }
+            }
+
+            async function main(params) {
+                const accessToken = getWithExpiry('accessToken');
+                if (!accessToken) {
+                    const url = new URL('https://connect.deezer.com/oauth/auth.php');
+                    addSearchParams(url, {
+                        app_id: '567602',
+                        redirect_uri: 'https://deezer.vacher.me/auth-callback',
+                        perms: 'basic_access,manage_library,delete_library',
+                    });
+                    window.location.href = url.href;
+                } else {
+                    document.querySelector('body').append(accessToken);
+                    // const url = new URL(`${BACKEND_URL}/getFavorites`);
+                    // url.searchParams.set('accessToken', accessToken);
+                    // const response = await fetch(url.href);
+                    // const body = await response.json();
+                }
+            }
+        </script>
+    </head>
+    <body></body>
+</html>

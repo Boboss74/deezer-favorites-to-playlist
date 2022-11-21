@@ -1,0 +1,46 @@
+service: deezer-favorites-to-playlist
+frameworkVersion: '3'
+
+configValidationMode: error
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-prune-plugin
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: eu-west-3
+  httpApi:
+    cors: true
+  environment:
+    APP_ID: ${env:APP_ID}
+    APP_SECRET: ${env:APP_SECRET}
+
+functions:
+  getToken:
+    handler: src/back/function/getToken.handler
+    events:
+      - httpApi:
+          path: /getToken
+          method: GET
+  getFavorites:
+    handler: src/back/function/getFavorites.handler
+    events:
+      - httpApi:
+          path: /getFavorites
+          method: GET
+  getPlaylists:
+    handler: src/back/function/getPlaylists.handler
+    events:
+      - httpApi:
+          path: /getPlaylists
+          method: GET
+  favoritesToPlaylist:
+    handler: src/back/function/favoritesToPlaylist.handler
+    events:
+      - httpApi:
+          path: /favoritesToPlaylist
+          method: PATCH

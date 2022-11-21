@@ -1,0 +1,40 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Deezer Favorites to Playlist</title>
+        <base href="/" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script>
+            document.addEventListener('DOMContentLoaded', async () => await main());
+
+            const BACKEND_URL = 'https://ja2wh1uznb.execute-api.eu-west-3.amazonaws.com';
+
+            function setWithExpiry(key, value, expiry) {
+                const now = new Date();
+                const item = { value, expiry };
+                localStorage.setItem(key, JSON.stringify(item));
+            }
+
+            async function main(params) {
+                const params = new URLSearchParams(window.location.search);
+                const code = params.get('code');
+                if (code) {
+                    const url = new URL(`${BACKEND_URL}/getToken`);
+                    url.searchParams.set('code', code);
+                    const response = await fetch(url.href);
+                    const body = await response.json();
+                    if (body.accessToken && body.expiresAt) {
+                        setWithExpiry('accessToken', body.accessToken, body.expiresAt);
+                        window.location.href = '/';
+                    } else {
+                        console.error('Invalid getToken response', JSON.stringify({ url, body }));
+                    }
+                } else {
+                    console.error('Missing code');
+                }
+            }
+        </script>
+    </head>
+
+    <body></body>
+</html>
